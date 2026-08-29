@@ -1,216 +1,106 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111827">
-  <title>MIDI Player</title>
-  <script src="https://unpkg.com/tone@15.1.22/build/Tone.js"></script>
-  <script src="https://unpkg.com/@tonejs/midi@2.0.28/build/Midi.js"></script>
-  <style>
-    *{box-sizing:border-box}
-    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eef2ff;background:#0b1020}
-    body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#27335f 0,#111827 38%,#080c18 100%)}
-    button,input{font:inherit}
-    .app{width:min(1100px,100%);margin:auto;padding:28px 18px 42px}
-    header{text-align:center;margin:8px 0 24px}.title{font-size:clamp(30px,6vw,52px);font-weight:800;letter-spacing:-.04em;margin:0}.subtitle{margin:7px 0 0;color:#aab4cf}
-    .card{background:rgba(18,25,45,.86);border:1px solid #2a3555;border-radius:20px;box-shadow:0 16px 45px rgba(0,0,0,.28);padding:20px;margin-top:16px;backdrop-filter:blur(12px)}
-    .drop{border:2px dashed #53648f;border-radius:18px;padding:34px 18px;text-align:center;cursor:pointer;transition:.2s;background:rgba(37,49,82,.28)}
-    .drop.drag{border-color:#93a8ff;background:rgba(70,88,150,.3);transform:scale(1.01)}
-    .drop h2{margin:0 0 8px;font-size:21px}.drop p{margin:0 0 18px;color:#aab4cf}.primary{border:0;border-radius:12px;padding:12px 18px;background:#647cff;color:white;font-weight:700;cursor:pointer}.primary:active,button:active{transform:translateY(1px)}
-    .hidden{display:none!important}.status{margin-top:13px;min-height:22px;color:#aab4cf;text-align:center}.error{color:#ff9eaa}.ok{color:#9ee6b0}
-    .info{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:16px}.stat{background:#0d1427;border-radius:13px;padding:12px}.stat small{display:block;color:#8290b3;font-size:12px}.stat strong{display:block;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .current{text-align:center;padding:22px 10px}.eyebrow{color:#8290b3;font-size:12px;text-transform:uppercase;letter-spacing:.15em}.note-main{font-size:clamp(38px,10vw,76px);font-weight:850;line-height:1.05;margin:9px 0}.note-sub{color:#aab4cf;font-family:ui-monospace,monospace}.notes-list{min-height:32px;color:#d9e0f5;margin-top:12px;font-size:18px;word-break:break-word}
-    .piano-wrap{overflow-x:auto;padding-bottom:4px}.piano{position:relative;height:145px;min-width:720px;background:#090d18;border-radius:14px;padding:0 8px;display:flex;align-items:flex-start;overflow:hidden}.key{position:relative;border:1px solid #27304a;border-radius:0 0 7px 7px;flex:0 0 34px;height:118px;background:#f4f5f7;color:#161a23;display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px;font-size:9px;cursor:default}.key.black{position:absolute;z-index:2;width:22px;height:75px;background:#121621;color:#e5e7eb;border-color:#30384e;border-radius:0 0 5px 5px}.key.active{background:#8295ff!important;color:#fff!important;box-shadow:0 0 14px rgba(130,149,255,.75)}
-    .roll{position:relative;height:290px;background:#080d19;border-radius:14px;overflow:hidden;border:1px solid #27304a}.roll-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(110,130,180,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(110,130,180,.07) 1px,transparent 1px);background-size:100% 20px,80px 100%}.roll-content{position:absolute;inset:0;overflow:hidden}.roll-note{position:absolute;height:9px;min-width:2px;border-radius:4px;background:#8194ff;opacity:.88}.roll-cursor{position:absolute;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 8px #fff;z-index:5;pointer-events:none}.roll-empty{position:absolute;inset:0;display:grid;place-items:center;color:#667391}
-    .timeline{margin-top:18px}.time-row{display:flex;justify-content:space-between;color:#9ca8c4;font-variant-numeric:tabular-nums;font-size:13px}.range{width:100%;accent-color:#8194ff;cursor:pointer}
-    .controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}.control{border:1px solid #34405f;background:#151d33;color:#eef2ff;border-radius:12px;min-width:74px;padding:12px 15px;cursor:pointer}.control.big{font-size:18px;min-width:110px}.control:disabled{opacity:.45;cursor:not-allowed}
-    .settings{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.setting label{display:flex;justify-content:space-between;color:#aab4cf;font-size:13px;margin-bottom:7px}.setting input[type=range]{width:100%;accent-color:#8194ff}.select{width:100%;background:#11192c;color:#eef2ff;border:1px solid #34405f;border-radius:10px;padding:9px}
-    details{margin-top:16px;color:#aab4cf}details summary{cursor:pointer;color:#dbe3fa}.help{line-height:1.7;font-size:14px}
-    @media(max-width:650px){.app{padding:18px 12px 32px}.card{padding:15px;border-radius:16px}.drop{padding:27px 12px}.settings{grid-template-columns:1fr}.control{flex:1}.control.big{min-width:90px}.key{flex-basis:30px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>MIDI Player</title>
+<script src="https://unpkg.com/tone@15.1.22/build/Tone.js"></script>
+<script src="https://unpkg.com/@tonejs/midi@2.0.28/build/Midi.js"></script>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eef2ff;background:#08101e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#24365f 0,#111827 35%,#070c16 100%)}
+.app{width:min(1120px,100%);margin:auto;padding:24px 14px 42px}.title{text-align:center;font-size:clamp(32px,7vw,54px);margin:0;font-weight:850}.sub{text-align:center;color:#aab6cf;margin:6px 0 22px}
+.card{background:rgba(17,27,47,.9);border:1px solid #2b3959;border-radius:18px;padding:17px;margin-top:14px;box-shadow:0 15px 40px rgba(0,0,0,.25)}
+.drop{border:2px dashed #536890;border-radius:16px;padding:30px 16px;text-align:center;cursor:pointer;background:#17243c55;transition:.2s}.drop.drag{border-color:#9aabff;background:#34477766}.drop h2{margin:0 0 7px}.drop p{color:#aab6cf;margin:0 0 15px}.primary,.btn{border:1px solid #43547b;background:#172440;color:#eef2ff;border-radius:11px;padding:10px 14px;cursor:pointer;font-weight:700}.primary{background:#647cff;border-color:#7e91ff}.btn:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}.status{text-align:center;min-height:21px;color:#aab6cf;margin-top:10px}.error{color:#ff9daa}.ok{color:#9fe5b4}
+.info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-top:14px}.stat{background:#0d1628;border:1px solid #22304b;border-radius:11px;padding:10px}.stat small{display:block;color:#8290af}.stat strong{display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.section-title{font-size:12px;color:#93a2c2;letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px}.current{text-align:center}.note-main{font-size:clamp(44px,11vw,78px);font-weight:900;line-height:1}.note-sub{font-family:ui-monospace,monospace;color:#b5bfd5;margin-top:7px}.notes-list{margin-top:12px;min-height:28px;font-size:18px;color:#dce4f7;word-break:break-word}
+.timeline input,.setting input{width:100%;accent-color:#8295ff}.time-row{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums;color:#9aa8c5;font-size:13px}.controls{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:12px}.controls .btn{min-width:100px}.big{font-size:17px}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:15px}.setting label{display:flex;justify-content:space-between;color:#aeb9d0;font-size:13px;margin-bottom:6px}.select{width:100%;background:#101a2e;color:#eef2ff;border:1px solid #344363;border-radius:10px;padding:9px}
+.parts{display:grid;gap:9px}.part{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px;background:#0d1628;border:1px solid #22304b;border-radius:12px;padding:11px}.part.disabled{opacity:.58}.part .name{min-width:0}.part .name strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.part .name small{color:#8290af}.toggle{min-width:68px}.toggle.off{background:#2a1c25;border-color:#60414e}.solo.on{background:#726020;border-color:#a98e33}.roll{height:260px;background:#080e1b;border:1px solid #263554;border-radius:13px;position:relative;overflow:hidden}.roll-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(120,140,190,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(120,140,190,.07) 1px,transparent 1px);background-size:100% 20px,80px 100%}.roll-content{position:absolute;inset:0;overflow:hidden}.rnote{position:absolute;height:8px;border-radius:4px;background:#8296ff}.cursor{position:absolute;top:0;bottom:0;width:2px;background:white;box-shadow:0 0 8px white;pointer-events:none}.roll-empty{position:absolute;inset:0;display:grid;place-items:center;color:#667391}.piano-wrap{overflow:auto}.piano{position:relative;height:132px;min-width:720px;display:flex;background:#080e1b;border-radius:12px;overflow:hidden;padding:0 5px}.key{flex:0 0 34px;height:108px;background:#f4f5f8;color:#131722;border:1px solid #2b3347;position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;font-size:9px}.black{position:absolute!important;width:22px;height:68px;background:#101521!important;color:#eef2ff;border-radius:0 0 5px 5px;z-index:2}.key.active{background:#8296ff!important;color:white!important;box-shadow:0 0 14px #8296ff99}
+.help{color:#aeb9d0;line-height:1.7;font-size:14px}details summary{cursor:pointer;color:#dae2f5}.partbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+@media(max-width:680px){.settings{grid-template-columns:1fr}.part{grid-template-columns:auto 1fr auto}.solo{grid-column:3}.toggle{grid-column:1/-1;width:100%}.app{padding-inline:10px}.card{padding:14px}}
+</style>
 </head>
 <body>
 <div class="app">
-  <header><h1 class="title">MIDI Player</h1><p class="subtitle">MIDIをアップロードして、音と音名をリアルタイムで確認</p></header>
-
-  <section class="card">
-    <div id="drop" class="drop" tabindex="0" role="button" aria-label="MIDIファイルを選択">
-      <h2>🎵 MIDIファイルを読み込む</h2>
-      <p>ここに .mid / .midi をドラッグ＆ドロップ</p>
-      <button id="pick" class="primary" type="button">ファイルを選択</button>
-      <input id="file" class="hidden" type="file" accept=".mid,.midi,audio/midi,audio/x-midi">
-    </div>
-    <div id="status" class="status">MIDIファイルを選択してください</div>
-    <div id="info" class="info hidden"></div>
-  </section>
-
-  <section id="player" class="hidden">
-    <div class="card current">
-      <div class="eyebrow">現在の音</div>
-      <div id="noteMain" class="note-main">—</div>
-      <div id="noteSub" class="note-sub">停止中</div>
-      <div id="notesList" class="notes-list">現在鳴っているノートはありません</div>
-    </div>
-
-    <div class="card">
-      <div class="eyebrow" style="margin-bottom:10px">ピアノロール</div>
-      <div id="roll" class="roll"><div class="roll-grid"></div><div id="rollContent" class="roll-content"></div><div id="cursor" class="roll-cursor"></div><div id="rollEmpty" class="roll-empty">MIDIを再生するとノートが表示されます</div></div>
-    </div>
-
-    <div class="card">
-      <div class="piano-wrap"><div id="piano" class="piano"></div></div>
-      <div class="timeline">
-        <input id="seek" class="range" type="range" min="0" max="1" step="0.01" value="0" aria-label="再生位置">
-        <div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
-      </div>
-      <div class="controls">
-        <button id="play" class="control big" type="button">▶ 再生</button>
-        <button id="pause" class="control big" type="button">⏸ 一時停止</button>
-        <button id="stop" class="control big" type="button">⏹ 停止</button>
-      </div>
-      <div class="settings">
-        <div class="setting"><label>音量 <span id="volText">80%</span></label><input id="volume" type="range" min="0" max="1" step="0.01" value="0.8"></div>
-        <div class="setting"><label>再生速度</label><select id="speed" class="select"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></div>
-      </div>
-    </div>
-  </section>
-
-  <details class="card"><summary>使い方・仕組み</summary><div class="help"><p><b>使い方：</b>MIDIを選択 → 再生を押します。iPhone/Safariでは最初の再生操作で音声エンジンが開始されます。</p><p><b>再生：</b>@tonejs/midiでMIDIのNote On/Off、テンポ、トラックなどを解析し、Tone.js + Web Audio APIのポリフォニックシンセで実際の音を生成します。</p><p><b>音名：</b>解析したMIDIノート番号をC4=ド4として変換し、再生位置と各ノートのtime/durationを照合して現在鳴っている音を表示します。マイク入力による音程推定ではありません。</p><p><b>注意：</b>このプレイヤーはブラウザ内で処理します。標準のシンセ音源を使うため、元MIDIの実機音源・楽器音色を完全再現するものではありません。</p></div></details>
+<h1 class="title">MIDI Player</h1>
+<p class="sub">MIDIを聴きながら、パート別ON/OFFと音名をリアルタイム表示</p>
+<section class="card">
+<div id="drop" class="drop" tabindex="0"><h2>🎵 MIDIファイルを読み込む</h2><p>.mid / .midi をここへドラッグ＆ドロップ</p><button id="pick" class="primary" type="button">ファイルを選択</button><input id="file" class="hidden" type="file" accept=".mid,.midi,audio/midi,audio/x-midi"></div>
+<div id="status" class="status">MIDIファイルを選択してください</div><div id="info" class="info hidden"></div>
+</section>
+<section id="player" class="hidden">
+<section class="card current"><div class="section-title">現在の音</div><div id="noteMain" class="note-main">—</div><div id="noteSub" class="note-sub">停止中</div><div id="notesList" class="notes-list">現在鳴っているノートはありません</div></section>
+<section class="card"><div class="section-title">パート</div><div class="partbar"><button id="allOn" class="btn" type="button">全ON</button><button id="allOff" class="btn" type="button">全OFF</button><button id="allSoloOff" class="btn" type="button">Solo解除</button></div><div id="parts" class="parts"></div></section>
+<section class="card"><div class="section-title">ピアノロール</div><div id="roll" class="roll"><div class="roll-grid"></div><div id="rollContent" class="roll-content"></div><div id="cursor" class="cursor"></div><div id="rollEmpty" class="roll-empty">MIDIを再生するとノートが表示されます</div></div></section>
+<section class="card"><div class="piano-wrap"><div id="piano" class="piano"></div></div>
+<div class="timeline"><input id="seek" type="range" min="0" max="1" step="0.01" value="0"><div class="time-row"><span id="currentTime">0:00</span><span id="duration">0:00</span></div></div>
+<div class="controls"><button id="play" class="btn big" type="button">▶ 再生</button><button id="pause" class="btn big" type="button">⏸ 一時停止</button><button id="stop" class="btn big" type="button">⏹ 停止</button></div>
+<div class="settings"><div class="setting"><label>音量 <span id="volText">80%</span></label><input id="volume" type="range" min="0" max="1" step="0.01" value="0.8"></div><div class="setting"><label>再生速度</label><select id="speed" class="select"><option value="0.1">0.1x</option><option value="0.2">0.2x</option><option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></div></div></section>
+<details class="card"><summary>使い方・仕組み</summary><div class="help"><p>MIDIを読み込んで「再生」。パート欄の「ON/OFF」で各トラックの音を個別に消音できます。「Solo」はそのパートだけを鳴らします。</p><p>速度変更は0.1xまで対応。速度を変えている途中でも現在位置をできるだけ維持します。</p><p>音名はMIDIノートイベントから判定します。C4=ド4、D4=レ4という形で表示し、和音なら同時に複数音を表示します。</p><p>再生音はTone.jsのWeb Audioシンセです。元MIDIの音源を完全に再現するものではありません。</p></div></details>
+</section>
 </div>
-
 <script>
-(() => {
-  'use strict';
-  const $ = id => document.getElementById(id);
-  const els = {
-    drop:$('drop'),pick:$('pick'),file:$('file'),status:$('status'),info:$('info'),player:$('player'),
-    noteMain:$('noteMain'),noteSub:$('noteSub'),notesList:$('notesList'),roll:$('roll'),rollContent:$('rollContent'),cursor:$('cursor'),rollEmpty:$('rollEmpty'),piano:$('piano'),seek:$('seek'),currentTime:$('currentTime'),duration:$('duration'),play:$('play'),pause:$('pause'),stop:$('stop'),volume:$('volume'),volText:$('volText'),speed:$('speed')
-  };
-  let midi = null, notes = [], synth = null, loopId = null, loadedFile = null, isPlaying = false;
-  const whiteNames = ['C','D','E','F','G','A','B'];
-  const jp = ['ド','ド♯','レ','レ♯','ミ','ファ','ファ♯','ソ','ソ♯','ラ','ラ♯','シ'];
-  const freq = n => 440 * Math.pow(2,(n-69)/12);
-  const midiName = n => `${['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'][n%12]}${Math.floor(n/12)-1}`;
-  const jpName = n => `${jp[n%12]}${Math.floor(n/12)-1}`;
-  const formatTime = s => { s = Math.max(0,Number(s)||0); const m=Math.floor(s/60), sec=Math.floor(s%60); return `${m}:${String(sec).padStart(2,'0')}`; };
-  const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-  function setStatus(text, type=''){ els.status.textContent=text; els.status.className='status '+type; }
-  function resetAudio(){
-    if(loopId){ cancelAnimationFrame(loopId); loopId=null; }
-    try{ Tone.Transport.stop(); Tone.Transport.cancel(); }catch(e){}
-    if(synth){ try{synth.dispose();}catch(e){} synth=null; }
-    isPlaying=false;
-  }
-  function createSynth(){
-    synth = new Tone.PolySynth(Tone.Synth, {oscillator:{type:'triangle'}, envelope:{attack:0.008,decay:0.08,sustain:0.55,release:0.28}, volume:-2}).toDestination();
-    synth.volume.value = Tone.gainToDb(Math.max(0.0001,Number(els.volume.value)));
-  }
-  function getNoteData(){
-    const arr=[];
-    if(!midi) return arr;
-    midi.tracks.forEach((track, ti) => track.notes.forEach(n => {
-      const name = midiName(n.midi);
-      arr.push({midi:n.midi,time:Number(n.time)||0,duration:Number(n.duration)||0.05,velocity:Number(n.velocity ?? 0.8),name,jp:jpName(n.midi),freq:freq(n.midi),track:ti});
-    }));
-    return arr.sort((a,b)=>a.time-b.time || a.midi-b.midi);
-  }
-  function schedule(){
-    Tone.Transport.cancel();
-    notes.forEach(n => {
-      Tone.Transport.schedule(time => {
-        if(!synth) return;
-        const dur=Math.max(0.025,n.duration);
-        synth.triggerAttackRelease(n.name,dur,time,Math.max(0.02,Math.min(1,n.velocity)));
-      }, n.time);
-    });
-  }
-  function renderInfo(){
-    const duration=Number(midi.duration)||0;
-    const tempos=[];
-    (midi.header.tempos||[]).forEach(t=>tempos.push(Number(t.bpm)||0));
-    const channels=new Set();
-    midi.tracks.forEach(t=>t.channel!=null && channels.add(t.channel));
-    els.info.innerHTML=`<div class="stat"><small>ファイル</small><strong title="${esc(loadedFile.name)}">${esc(loadedFile.name)}</strong></div><div class="stat"><small>サイズ</small><strong>${(loadedFile.size/1024).toFixed(1)} KB</strong></div><div class="stat"><small>トラック</small><strong>${midi.tracks.length}</strong></div><div class="stat"><small>チャンネル</small><strong>${channels.size || '—'}</strong></div><div class="stat"><small>テンポ</small><strong>${tempos.length ? tempos.map(x=>Math.round(x)+' BPM').join(', ') : '—'}</strong></div><div class="stat"><small>拍子</small><strong>${(midi.header.timeSignatures||[]).length ? midi.header.timeSignatures.map(x=>x.timeSignature.join('/')).join(', ') : '—'}</strong></div><div class="stat"><small>再生時間</small><strong>${formatTime(duration)}</strong></div><div class="stat"><small>ノート数</small><strong>${notes.length.toLocaleString()}</strong></div>`;
-    els.info.classList.remove('hidden'); els.duration.textContent=formatTime(duration); els.seek.max=duration || 1;
-  }
-  function renderRoll(){
-    els.rollContent.innerHTML='';
-    if(!notes.length){els.rollEmpty.classList.remove('hidden');return;}
-    els.rollEmpty.classList.add('hidden');
-    const min=Math.min(...notes.map(n=>n.midi)), max=Math.max(...notes.map(n=>n.midi));
-    const span=Math.max(1,max-min+1), duration=Math.max(1,Number(midi.duration)||1);
-    notes.forEach(n=>{
-      const el=document.createElement('div'); el.className='roll-note';
-      el.style.left=`${(n.time/duration)*100}%`; el.style.width=`${Math.max(.15,(n.duration/duration)*100)}%`;
-      el.style.top=`${((max-n.midi)/span)*100}%`;
-      els.rollContent.appendChild(el);
-    });
-  }
-  function renderPiano(){
-    els.piano.innerHTML='';
-    const start=36,end=96;
-    for(let n=start;n<=end;n++){
-      const k=document.createElement('div'); k.className='key'; k.dataset.midi=n; k.textContent=(n%12===0||n===60)?midiName(n):''; els.piano.appendChild(k);
-      if(![1,3,6,8,10].includes(n%12) && n<end){
-        const b=document.createElement('div'); b.className='key black'; b.dataset.midi=n+1; b.style.left=`${((n-start+1)*34)-11}px`; els.piano.appendChild(b);
-      }
-    }
-  }
-  function activeAt(t){ return notes.filter(n=>t >= n.time && t < n.time+n.duration); }
-  function updateUI(){
-    if(!midi) return;
-    const t=Math.min(Number(Tone.Transport.seconds)||0,Number(midi.duration)||0);
-    els.seek.value=t; els.currentTime.textContent=formatTime(t);
-    const active=activeAt(t);
-    document.querySelectorAll('.key.active').forEach(k=>k.classList.remove('active'));
-    active.forEach(n=>{const k=document.querySelector(`.key[data-midi="${n.midi}"]`);if(k)k.classList.add('active');});
-    if(active.length){
-      els.noteMain.textContent=active.length===1?`♪ ${active[0].jp}`:`♪ ${active.map(n=>n.jp).join('  ')}`;
-      els.noteSub.textContent=active.length===1?`${active[0].name}  •  ${active[0].freq.toFixed(2)} Hz  •  MIDI ${active[0].midi}`:`${active.map(n=>n.name).join('  ')}  •  ${active.map(n=>n.midi).join(', ')}`;
-      els.notesList.textContent=`現在のノート: ${active.map(n=>n.jp).join(' / ')}`;
-    } else { els.noteMain.textContent='—'; els.noteSub.textContent=isPlaying?'休符':'停止中'; els.notesList.textContent='現在鳴っているノートはありません'; }
-    const duration=Math.max(0.01,Number(midi.duration)||1); els.cursor.style.left=`${(t/duration)*100}%`;
-    loopId=requestAnimationFrame(updateUI);
-  }
-  async function startPlayback(){
-    if(!midi || !notes.length) return;
-    try{
-      await Tone.start();
-      if(!synth) createSynth();
-      if(Tone.Transport.state==='stopped'){ schedule(); Tone.Transport.seconds=Number(els.seek.value)||0; }
-      Tone.Transport.playbackRate=Number(els.speed.value);
-      Tone.Transport.start(); isPlaying=true;
-      if(loopId) cancelAnimationFrame(loopId); loopId=requestAnimationFrame(updateUI);
-      setStatus('再生中','ok');
-    }catch(err){ console.error(err); setStatus('音声を開始できませんでした。再生ボタンをもう一度押してください。','error'); }
-  }
-  function pausePlayback(){ if(!midi)return; Tone.Transport.pause(); isPlaying=false; setStatus('一時停止'); if(loopId)cancelAnimationFrame(loopId); updateUI(); }
-  function stopPlayback(){ if(!midi)return; Tone.Transport.stop(); isPlaying=false; els.seek.value=0; els.currentTime.textContent='0:00'; els.noteMain.textContent='—'; els.noteSub.textContent='停止中'; els.notesList.textContent='現在鳴っているノートはありません'; document.querySelectorAll('.key.active').forEach(k=>k.classList.remove('active')); els.cursor.style.left='0%'; if(loopId)cancelAnimationFrame(loopId); setStatus('停止'); }
-  async function loadFile(file){
-    if(!file) return;
-    const ext=(file.name.split('.').pop()||'').toLowerCase();
-    if(!['mid','midi'].includes(ext)){setStatus('MIDIファイル（.mid / .midi）を選択してください','error');return;}
-    resetAudio(); midi=null; notes=[]; loadedFile=file; els.player.classList.add('hidden'); setStatus('MIDIを解析しています…');
-    try{
-      const buffer=await file.arrayBuffer();
-      midi=new Midi(buffer); notes=getNoteData();
-      if(!notes.length){throw new Error('ノートイベントが見つかりません');}
-      renderInfo(); renderRoll(); renderPiano(); els.player.classList.remove('hidden'); els.seek.value=0; els.currentTime.textContent='0:00'; setStatus(`読み込み完了：${notes.length.toLocaleString()} ノート`,'ok');
-    }catch(err){console.error(err);midi=null;notes=[];setStatus(`読み込みに失敗しました：${err.message||'無効なMIDIファイルです'}`,'error');}
-  }
-  els.pick.addEventListener('click',e=>{e.stopPropagation();els.file.click();});
-  els.drop.addEventListener('click',e=>{if(e.target!==els.pick)els.file.click();});
-  els.file.addEventListener('change',()=>loadFile(els.file.files[0]));
-  ['dragenter','dragover'].forEach(ev=>els.drop.addEventListener(ev,e=>{e.preventDefault();els.drop.classList.add('drag');}));
-  ['dragleave','drop'].forEach(ev=>els.drop.addEventListener(ev,e=>{e.preventDefault();els.drop.classList.remove('drag');}));
-  els.drop.addEventListener('drop',e=>loadFile(e.dataTransfer.files[0]));
-  els.play.addEventListener('click',startPlayback); els.pause.addEventListener('click',pausePlayback); els.stop.addEventListener('click',stopPlayback);
-  els.seek.addEventListener('input',()=>{if(!midi)return; const wasPlaying=isPlaying; Tone.Transport.pause(); Tone.Transport.seconds=Number(els.seek.value); updateUI(); if(wasPlaying)Tone.Transport.start();});
-  els.volume.addEventListener('input',()=>{const v=Number(els.volume.value);els.volText.textContent=Math.round(v*100)+'%';if(synth)synth.volume.value=Tone.gainToDb(Math.max(.0001,v));});
-  els.speed.addEventListener('change',()=>{if(Tone.Transport)Tone.Transport.playbackRate=Number(els.speed.value);});
-  window.addEventListener('beforeunload',resetAudio);
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const e={drop:$('drop'),pick:$('pick'),file:$('file'),status:$('status'),info:$('info'),player:$('player'),noteMain:$('noteMain'),noteSub:$('noteSub'),notesList:$('notesList'),parts:$('parts'),seek:$('seek'),currentTime:$('currentTime'),duration:$('duration'),play:$('play'),pause:$('pause'),stop:$('stop'),volume:$('volume'),volText:$('volText'),speed:$('speed'),rollContent:$('rollContent'),cursor:$('cursor'),rollEmpty:$('rollEmpty'),roll:$('roll'),piano:$('piano'),allOn:$('allOn'),allOff:$('allOff'),allSoloOff:$('allSoloOff')};
+let midi=null,allNotes=[],tracks=[],synth=null,loopId=null,transportSpeed=1,isPlaying=false,position=0,lastFrame=0,loadedFile=null,dragDepth=0;
+const names=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const jp=['ド','ド♯','レ','レ♯','ミ','ファ','ファ♯','ソ','ソ♯','ラ','ラ♯','シ'];
+const hz=n=>440*Math.pow(2,(n-69)/12); const noteName=n=>names[n%12]+(Math.floor(n/12)-1); const jpNote=n=>jp[n%12]+(Math.floor(n/12)-1);
+const fmt=s=>{s=Math.max(0,Number(s)||0);return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function status(t,c=''){e.status.textContent=t;e.status.className='status '+c}
+function stopLoop(){if(loopId)cancelAnimationFrame(loopId);loopId=null}
+function disposeSynth(){if(synth){try{synth.releaseAll()}catch{}try{synth.dispose()}catch{}synth=null}}
+function ensureSynth(){if(synth)return;synth=new Tone.PolySynth(Tone.Synth,{oscillator:{type:'triangle'},envelope:{attack:.008,decay:.06,sustain:.55,release:.23},volume:-3}).toDestination();applyVolume()}
+function applyVolume(){if(synth){const v=Number(e.volume.value);synth.volume.value=Tone.gainToDb(Math.max(.0001,v))}e.volText.textContent=Math.round(Number(e.volume.value)*100)+'%'}
+function getTracks(){
+return midi.tracks.map((t,i)=>({id:i,name:(t.name||'').trim()||`パート ${i+1}`,channel:t.channel==null?'—':t.channel,nnotes:t.notes.length,on:true,solo:false,notes:t.notes.map(n=>({midi:n.midi,time:Number(n.time)||0,duration:Math.max(.03,Number(n.duration)||.03),velocity:Number(n.velocity??.8)||.8}))}));
+}
+function renderParts(){
+ e.parts.innerHTML=''; tracks.forEach((t,i)=>{const row=document.createElement('div');row.className='part'+(t.on?'':' disabled');row.innerHTML=`<div>🎹</div><div class="name"><strong>${esc(t.name)}</strong><small>Track ${i+1} / ${t.nnotes}ノート / Ch ${esc(t.channel)}</small></div><button class="btn toggle ${t.on?'':'off'}" data-i="${i}" type="button">${t.on?'🔊 ON':'🔇 OFF'}</button><button class="btn solo ${t.solo?'on':''}" data-solo="${i}" type="button">${t.solo?'SOLO中':'Solo'}</button>`;e.parts.appendChild(row)});
+ e.parts.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.i);tracks[i].on=!tracks[i].on;renderParts();if(isPlaying)rebuildFromPosition();});
+ e.parts.querySelectorAll('[data-solo]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.solo);const next=!tracks[i].solo;tracks.forEach(t=>t.solo=false);tracks[i].solo=next;renderParts();if(isPlaying)rebuildFromPosition();});
+}
+function audible(t){const anySolo=tracks.some(x=>x.solo);return anySolo?t.solo:t.on}
+function flatten(){allNotes=[];tracks.forEach((t,ti)=>t.notes.forEach(n=>allNotes.push({...n,track:ti,name:noteName(n.midi),jp:jpNote(n.midi),freq:hz(n.midi)})));allNotes.sort((a,b)=>a.time-b.time||a.midi-b.midi)}
+function maxDuration(){return Number(midi?.duration)||allNotes.reduce((m,n)=>Math.max(m,n.time+n.duration),0)||0}
+function scheduleFrom(p){
+ ensureSynth();Tone.Transport.stop();Tone.Transport.cancel();
+ const speed=transportSpeed; allNotes.forEach(n=>{if(!audible(tracks[n.track]))return;const when=n.time*speed; if(when<p*speed-0.02)return; Tone.Transport.schedule(time=>{if(!synth||!audible(tracks[n.track]))return;synth.triggerAttackRelease(n.name,Math.max(.025,n.duration*speed),time,Math.max(.02,Math.min(1,n.velocity)));},when)});Tone.Transport.start(undefined,p*speed);
+}
+function releaseAndReschedule(){try{synth?.releaseAll()}catch{};scheduleFrom(position)}
+function rebuildFromPosition(){if(isPlaying){const p=currentPosition();position=p;releaseAndReschedule()}}
+function currentPosition(){return Math.max(0,Number(Tone.Transport.seconds||0)/transportSpeed)}
+function updateUI(){
+ const dur=maxDuration(); let p=isPlaying?currentPosition():position; if(p>dur){p=dur;position=dur;isPlaying=false;try{Tone.Transport.stop()}catch{}}
+ e.seek.max=Math.max(0.01,dur);e.seek.value=Math.min(dur,p);e.currentTime.textContent=fmt(p);e.duration.textContent=fmt(dur);
+ const active=allNotes.filter(n=>n.time<=p+0.002&&n.time+n.duration>p&&audible(tracks[n.track]));
+ const unique=[...new Map(active.map(n=>[n.track+'-'+n.midi+'-'+n.time,n])).values()].sort((a,b)=>a.midi-b.midi);
+ if(unique.length){e.noteMain.textContent=unique.length===1?unique[0].jp:unique.map(n=>n.jp).join('  ');e.noteSub.textContent=unique.length===1?`${unique[0].name}  •  ${unique[0].freq.toFixed(2)} Hz  •  MIDI ${unique[0].midi}`:`${unique.map(n=>n.name).join('  ')}  •  ${unique.length}音` ;e.notesList.textContent=unique.map(n=>`${n.jp} (${n.name})`).join(' / ')}else{e.noteMain.textContent='—';e.noteSub.textContent=isPlaying?'再生中・現在の発音なし':'停止中';e.notesList.textContent='現在鳴っているノートはありません'}
+ renderCursor(p,dur); renderPiano(unique); if(isPlaying){loopId=requestAnimationFrame(updateUI)}
+}
+function renderCursor(p,d){const w=e.roll.clientWidth||1;e.cursor.style.left=(d?Math.min(1,p/d):0)*w+'px'}
+function renderPiano(active){const set=new Set(active.map(n=>n.midi));e.piano.querySelectorAll('.key').forEach(k=>k.classList.toggle('active',set.has(Number(k.dataset.midi))))}
+function renderRoll(){e.rollContent.innerHTML='';const dur=maxDuration();if(!allNotes.length){e.rollEmpty.style.display='grid';return}e.rollEmpty.style.display='none';const min=Math.min(...allNotes.map(n=>n.midi));const max=Math.max(...allNotes.map(n=>n.midi));const span=Math.max(1,max-min+1);const W=Math.max(1000,e.roll.clientWidth*2);allNotes.forEach(n=>{const el=document.createElement('div');el.className='rnote';el.style.left=(n.time/dur*W)+'px';el.style.width=Math.max(3,n.duration/dur*W)+'px';el.style.top=((max-n.midi)/span*(e.roll.clientHeight-12))+'px';el.dataset.track=n.track;el.style.opacity=audible(tracks[n.track])?.9:.15;e.rollContent.appendChild(el)});e.rollContent.style.width=W+'px'}
+function renderPiano(){e.piano.innerHTML='';const start=48,end=84;for(let n=start;n<=end;n++){const key=document.createElement('div');key.className='key';key.dataset.midi=n;key.textContent=names[n%12];e.piano.appendChild(key);if(![0,2,4,5,7,9,11].includes(n%12)){const black=document.createElement('div');black.className='key black';black.dataset.midi=n;black.textContent='';black.style.left=((n-start)*34-11)+'px';e.piano.appendChild(black)}}}
+function renderInfo(){const dur=maxDuration();const bpms=(midi.header.tempos||[]).map(x=>Number(x.bpm)||0).filter(Boolean);const ch=new Set();midi.tracks.forEach(t=>{if(t.channel!=null)ch.add(t.channel)});e.info.innerHTML=`<div class="stat"><small>ファイル</small><strong title="${esc(loadedFile.name)}">${esc(loadedFile.name)}</strong></div><div class="stat"><small>サイズ</small><strong>${(loadedFile.size/1024).toFixed(1)} KB</strong></div><div class="stat"><small>トラック</small><strong>${midi.tracks.length}</strong></div><div class="stat"><small>チャンネル</small><strong>${ch.size||'—'}</strong></div><div class="stat"><small>テンポ</small><strong>${bpms[0]?bpms[0].toFixed(1)+' BPM':'—'}</strong></div><div class="stat"><small>ノート</small><strong>${allNotes.length.toLocaleString()}</strong></div><div class="stat"><small>再生時間</small><strong>${fmt(dur)}</strong></div>`}
+async function loadFile(file){
+ if(!file)return; if(!/\.(mid|midi)$/i.test(file.name)){status('MIDIファイル（.mid / .midi）を選択してください','error');return}
+ stopLoop();isPlaying=false;try{Tone.Transport.stop();Tone.Transport.cancel()}catch{}disposeSynth();position=0;loadedFile=file;status('MIDIを解析中…');
+ try{const buf=await file.arrayBuffer();midi=new Midi(buf);tracks=getTracks();flatten();renderInfo();renderParts();renderPiano();renderRoll();e.player.classList.remove('hidden');e.info.classList.remove('hidden');e.seek.max=Math.max(.01,maxDuration());e.seek.value=0;status(`読み込み完了：${file.name}`,'ok');updateUI()}catch(err){midi=null;allNotes=[];e.player.classList.add('hidden');e.info.classList.add('hidden');status('MIDIの読み込みに失敗しました。壊れているか未対応の形式の可能性があります。','error');console.error(err)}}
+async function start(){if(!midi)return;if(!(Tone.context.state==='running'))await Tone.start();ensureSynth();if(position>=maxDuration())position=0;scheduleFrom(position);isPlaying=true;updateUI()}
+function pause(){if(!isPlaying)return;position=currentPosition();isPlaying=false;try{Tone.Transport.pause()}catch{}stopLoop();try{synth?.releaseAll()}catch{};updateUI()}
+function stop(){isPlaying=false;stopLoop();try{Tone.Transport.stop();Tone.Transport.cancel()}catch{};try{synth?.releaseAll()}catch{};position=0;updateUI()}
+function seekTo(v){const p=Math.max(0,Math.min(maxDuration(),Number(v)||0));position=p;if(isPlaying)releaseAndReschedule();else updateUI()}
+async function changeSpeed(){const p=currentPosition();const was=isPlaying;position=p;transportSpeed=Number(e.speed.value)||1; if(was){scheduleFrom(position)}updateUI()}
+e.pick.onclick=()=>e.file.click();e.file.onchange=()=>loadFile(e.file.files[0]);e.drop.onclick=ev=>{if(ev.target!==e.pick)e.file.click()};e.drop.ondragenter=ev=>{ev.preventDefault();dragDepth++;e.drop.classList.add('drag')};e.drop.ondragleave=ev=>{ev.preventDefault();dragDepth=Math.max(0,dragDepth-1);if(!dragDepth)e.drop.classList.remove('drag')};e.drop.ondragover=ev=>ev.preventDefault();e.drop.ondrop=ev=>{ev.preventDefault();dragDepth=0;e.drop.classList.remove('drag');loadFile(ev.dataTransfer.files[0])};e.play.onclick=start;e.pause.onclick=pause;e.stop.onclick=stop;e.seek.oninput=()=>seekTo(e.seek.value);e.volume.oninput=applyVolume;e.speed.onchange=changeSpeed;
+e.allOn.onclick=()=>{tracks.forEach(t=>t.on=true);renderParts();renderRoll();if(isPlaying)rebuildFromPosition()};e.allOff.onclick=()=>{tracks.forEach(t=>{t.on=false;t.solo=false});renderParts();renderRoll();if(isPlaying)rebuildFromPosition()};e.allSoloOff.onclick=()=>{tracks.forEach(t=>t.solo=false);renderParts();renderRoll();if(isPlaying)rebuildFromPosition()};
+window.addEventListener('resize',()=>{if(midi)renderRoll();updateUI()});
+updateUI();
 })();
 </script>
 </body>
